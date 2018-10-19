@@ -1,0 +1,623 @@
+package com.biup.okex;
+
+import com.biup.okex.po.PlatInfo;
+import com.biup.okex.service.PlatInfoService;
+import com.biup.okex.websocket.WebSocketService;
+import com.biup.okex.websocket.WebSoketClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.annotation.PostConstruct;
+import java.awt.image.RescaleOp;
+
+@SpringBootApplication
+public class WebsocketOkexApplication {
+    private static final Logger logger = LoggerFactory.getLogger(WebsocketOkexApplication.class);
+
+    @Autowired
+    private WebSocketService webSocketService;
+    @Autowired
+    private PlatInfoService platInfoService;
+    private static WebSocketService staticWebSocketService;
+    private static PlatInfoService staticPlatInfoService;
+    private static String accessKey;
+    private static String secretKey;
+    private static String url = "wss://real.okex.com:10441/websocket";
+    private static final Integer plateId = 2;//OKEX 平台ID
+
+    @PostConstruct
+    public void init() {
+        staticWebSocketService = webSocketService;
+        staticPlatInfoService = platInfoService;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(WebsocketOkexApplication.class, args);
+
+        String[] symbols = oksymbol.split(",");
+        try {
+            PlatInfo platInfo = new PlatInfo();
+            platInfo.setPlatId(plateId);
+            platInfo = staticPlatInfoService.get(platInfo);
+            if (platInfo != null) {
+                //你的秘钥
+                accessKey = platInfo.getAccessKey();
+                secretKey = platInfo.getSecretKey();
+
+                WebSoketClient client = new WebSoketClient(url, staticWebSocketService);
+                // 启动客户端
+                client.start();
+                client.login(accessKey, secretKey);
+                if (symbols != null && symbols.length > 0) {
+                    for (int i = 0; i < symbols.length; i++) {
+                        String symbol = symbols[i].trim();
+                        String channel = "ok_sub_spot_" + symbol + "_order";
+                        //logger.info("websocket-okex channel:{}", channel);
+                        client.orderInfo(accessKey, secretKey, channel);
+                    }
+                }
+                logger.info("websocket-okex 监听......");
+            } else {
+                logger.info("平台信息不存在......");
+            }
+        } catch (Exception e) {
+            logger.error("websocket-okex 监听异常:", e);
+        }
+
+    }
+
+    private static final String oksymbol = "bch_btc," +
+            "ltc_btc," +
+            "eth_btc," +
+            "etc_btc," +
+            "eth_usdt," +
+            "btc_usdt," +
+            "bt2_btc," +
+            "etc_eth," +
+            "btg_btc," +
+            "ltc_usdt," +
+            "etc_usdt," +
+            "bch_usdt," +
+            "qtum_btc," +
+            "qtum_usdt," +
+            "qtum_eth," +
+            "neo_btc," +
+            "gas_btc," +
+            "hsr_btc," +
+            "neo_eth," +
+            "gas_eth," +
+            "hsr_eth," +
+            "neo_usdt," +
+            "gas_usdt," +
+            "hsr_usdt," +
+            "dash_btc," +
+            "xrp_btc," +
+            "zec_btc," +
+            "dash_eth," +
+            "xrp_eth," +
+            "zec_eth," +
+            "dash_usdt," +
+            "xrp_usdt," +
+            "zec_usdt," +
+            "iota_btc," +
+            "xuc_btc," +
+            "iota_eth," +
+            "xuc_eth," +
+            "iota_usdt," +
+            "xuc_usdt," +
+            "eos_btc," +
+            "omg_btc," +
+            "eos_eth," +
+            "omg_eth," +
+            "eos_usdt," +
+            "omg_usdt," +
+            "act_btc," +
+            "btm_btc," +
+            "act_eth," +
+            "btm_eth," +
+            "act_usdt," +
+            "btm_usdt," +
+            "bcd_btc," +
+            "bcd_usdt," +
+            "storj_btc," +
+            "snt_btc," +
+            "storj_eth," +
+            "snt_eth," +
+            "storj_usdt," +
+            "snt_usdt," +
+            "pay_btc," +
+            "dgd_btc," +
+            "gnt_btc," +
+            "pay_eth," +
+            "dgd_eth," +
+            "gnt_eth," +
+            "pay_usdt," +
+            "dgd_usdt," +
+            "gnt_usdt," +
+            "lrc_btc," +
+            "nuls_btc," +
+            "mco_btc," +
+            "lrc_eth," +
+            "nuls_eth," +
+            "mco_eth," +
+            "lrc_usdt," +
+            "nuls_usdt," +
+            "mco_usdt," +
+            "btg_usdt," +
+            "cmt_btc," +
+            "itc_btc," +
+            "cmt_eth," +
+            "itc_eth," +
+            "cmt_usdt," +
+            "itc_usdt," +
+            "sbtc_btc," +
+            "pra_btc," +
+            "san_btc," +
+            "edo_btc," +
+            "avt_btc," +
+            "pra_eth," +
+            "san_eth," +
+            "edo_eth," +
+            "avt_eth," +
+            "pra_usdt," +
+            "san_usdt," +
+            "edo_usdt," +
+            "avt_usdt," +
+            "ltc_eth," +
+            "link_btc," +
+            "salt_btc," +
+            "1st_btc," +
+            "wtc_btc," +
+            "sngls_btc," +
+            "snm_btc," +
+            "zrx_btc," +
+            "bnt_btc," +
+            "cvc_btc," +
+            "link_eth," +
+            "salt_eth," +
+            "1st_eth," +
+            "wtc_eth," +
+            "sngls_eth," +
+            "snm_eth," +
+            "zrx_eth," +
+            "bnt_eth," +
+            "cvc_eth," +
+            "link_usdt," +
+            "salt_usdt," +
+            "1st_usdt," +
+            "wtc_usdt," +
+            "sngls_usdt," +
+            "snm_usdt," +
+            "zrx_usdt," +
+            "bnt_usdt," +
+            "cvc_usdt," +
+            "bcx_btc," +
+            "mana_btc," +
+            "rcn_btc," +
+            "mana_eth," +
+            "mana_usdt," +
+            "vee_btc," +
+            "vee_eth," +
+            "vee_usdt," +
+            "tnb_btc," +
+            "tnb_eth," +
+            "tnb_usdt," +
+            "amm_btc," +
+            "amm_eth," +
+            "amm_usdt," +
+            "knc_btc," +
+            "knc_eth," +
+            "knc_usdt," +
+            "dat_eth," +
+            "dat_btc," +
+            "dat_usdt," +
+            "gnx_btc," +
+            "gnx_eth," +
+            "gnx_usdt," +
+            "icx_btc," +
+            "icx_eth," +
+            "icx_usdt," +
+            "ark_btc," +
+            "ark_eth," +
+            "ark_usdt," +
+            "yoyo_btc," +
+            "yoyo_eth," +
+            "yoyo_usdt," +
+            "qvt_btc," +
+            "qvt_eth," +
+            "qvt_usdt," +
+            "elf_eth," +
+            "elf_btc," +
+            "elf_usdt," +
+            "ast_btc," +
+            "ast_eth," +
+            "ast_usdt," +
+            "sub_btc," +
+            "sub_eth," +
+            "sub_usdt," +
+            "dnt_btc," +
+            "dnt_eth," +
+            "dnt_usdt," +
+            "fun_btc," +
+            "fun_eth," +
+            "fun_usdt," +
+            "ace_btc," +
+            "ace_eth," +
+            "ace_usdt," +
+            "trx_btc," +
+            "trx_eth," +
+            "trx_usdt," +
+            "evx_btc," +
+            "evx_eth," +
+            "evx_usdt," +
+            "mda_btc," +
+            "mda_eth," +
+            "mda_usdt," +
+            "mth_btc," +
+            "mth_eth," +
+            "mth_usdt," +
+            "mtl_btc," +
+            "mtl_eth," +
+            "mtl_usdt," +
+            "xem_btc," +
+            "xem_eth," +
+            "xem_usdt," +
+            "icn_btc," +
+            "icn_eth," +
+            "icn_usdt," +
+            "eng_btc," +
+            "req_btc," +
+            "oax_btc," +
+            "dgb_btc," +
+            "ppt_btc," +
+            "dgb_eth," +
+            "dgb_usdt," +
+            "ppt_eth," +
+            "ppt_usdt," +
+            "oax_eth," +
+            "oax_usdt," +
+            "req_eth," +
+            "req_usdt," +
+            "eng_eth," +
+            "eng_usdt," +
+            "rcn_eth," +
+            "rcn_usdt," +
+            "swftc_btc," +
+            "swftc_eth," +
+            "swftc_usdt," +
+            "rdn_btc," +
+            "rdn_eth," +
+            "rdn_usdt," +
+            "xmr_btc," +
+            "xmr_eth," +
+            "xmr_usdt," +
+            "xlm_btc," +
+            "xlm_eth," +
+            "xlm_usdt," +
+            "kcash_btc," +
+            "kcash_eth," +
+            "kcash_usdt," +
+            "mdt_btc," +
+            "mdt_eth," +
+            "mdt_usdt," +
+            "nas_btc," +
+            "nas_eth," +
+            "nas_usdt," +
+            "rnt_btc," +
+            "rnt_eth," +
+            "rnt_usdt," +
+            "wrc_btc," +
+            "wrc_eth," +
+            "wrc_usdt," +
+            "ukg_btc," +
+            "ukg_eth," +
+            "ukg_usdt," +
+            "ugc_btc," +
+            "ugc_eth," +
+            "ugc_usdt," +
+            "dpy_btc," +
+            "dpy_eth," +
+            "dpy_usdt," +
+            "read_btc," +
+            "read_eth," +
+            "read_usdt," +
+            "ssc_btc," +
+            "ssc_eth," +
+            "ssc_usdt," +
+            "aac_btc," +
+            "fair_btc," +
+            "aac_eth," +
+            "aac_usdt," +
+            "fair_eth," +
+            "fair_usdt," +
+            "ubtc_btc," +
+            "ubtc_eth," +
+            "ubtc_usdt," +
+            "cag_btc," +
+            "cag_eth," +
+            "cag_usdt," +
+            "dna_btc," +
+            "lend_btc," +
+            "lend_eth," +
+            "dna_eth," +
+            "lend_usdt," +
+            "dna_usdt," +
+            "rct_btc," +
+            "rct_eth," +
+            "rct_usdt," +
+            "bch_eth," +
+            "show_btc," +
+            "show_eth," +
+            "show_usdt," +
+            "vib_btc," +
+            "vib_eth," +
+            "vib_usdt," +
+            "mot_btc," +
+            "mot_eth," +
+            "mot_usdt," +
+            "utk_btc," +
+            "utk_eth," +
+            "utk_usdt," +
+            "mag_btc," +
+            "mag_eth," +
+            "mag_usdt," +
+            "topc_btc," +
+            "topc_eth," +
+            "brd_btc," +
+            "topc_usdt," +
+            "qun_btc," +
+            "brd_eth," +
+            "qun_eth," +
+            "qun_usdt," +
+            "brd_usdt," +
+            "viu_btc," +
+            "viu_eth," +
+            "ost_btc," +
+            "viu_usdt," +
+            "ost_eth," +
+            "ost_usdt," +
+            "aidoc_btc," +
+            "aidoc_eth," +
+            "aidoc_usdt," +
+            "int_btc," +
+            "la_btc," +
+            "la_eth," +
+            "la_usdt," +
+            "int_eth," +
+            "int_usdt," +
+            "ipc_btc," +
+            "ipc_eth," +
+            "ipc_usdt," +
+            "ngc_btc," +
+            "ngc_eth," +
+            "ngc_usdt," +
+            "tio_btc," +
+            "tio_eth," +
+            "tio_usdt," +
+            "iost_btc," +
+            "iost_eth," +
+            "iost_usdt," +
+            "poe_btc," +
+            "poe_eth," +
+            "poe_usdt," +
+            "mof_btc," +
+            "yee_btc," +
+            "mof_eth," +
+            "yee_eth," +
+            "yee_usdt," +
+            "mof_usdt," +
+            "ins_btc," +
+            "ins_eth," +
+            "ins_usdt," +
+            "tct_btc," +
+            "tct_eth," +
+            "tct_usdt," +
+            "atl_btc," +
+            "atl_eth," +
+            "atl_usdt," +
+            "theta_btc," +
+            "theta_eth," +
+            "lev_btc," +
+            "theta_usdt," +
+            "lev_eth," +
+            "lev_usdt," +
+            "stc_btc," +
+            "spf_btc," +
+            "stc_eth," +
+            "spf_eth," +
+            "spf_usdt," +
+            "stc_usdt," +
+            "ref_btc," +
+            "ref_eth," +
+            "ref_usdt," +
+            "snc_btc," +
+            "snc_eth," +
+            "snc_usdt," +
+            "pst_btc," +
+            "pst_eth," +
+            "pst_usdt," +
+            "can_btc," +
+            "can_eth," +
+            "can_usdt," +
+            "hot_btc," +
+            "mkr_btc," +
+            "mkr_eth," +
+            "mkr_usdt," +
+            "hot_eth," +
+            "key_btc," +
+            "hot_usdt," +
+            "key_eth," +
+            "key_usdt," +
+            "light_btc," +
+            "light_eth," +
+            "light_usdt," +
+            "true_btc," +
+            "true_eth," +
+            "true_usdt," +
+            "of_btc," +
+            "of_eth," +
+            "of_usdt," +
+            "soc_btc," +
+            "soc_eth," +
+            "soc_usdt," +
+            "wbtc_btc," +
+            "dent_btc," +
+            "dent_eth," +
+            "dent_usdt," +
+            "zen_btc," +
+            "zen_eth," +
+            "zen_usdt," +
+            "hmc_btc," +
+            "hmc_eth," +
+            "hmc_usdt," +
+            "zip_btc," +
+            "zip_eth," +
+            "zip_usdt," +
+            "nano_btc," +
+            "nano_eth," +
+            "nano_usdt," +
+            "cic_btc," +
+            "cic_eth," +
+            "cic_usdt," +
+            "gto_btc," +
+            "gto_eth," +
+            "gto_usdt," +
+            "chat_btc," +
+            "chat_eth," +
+            "chat_usdt," +
+            "insur_btc," +
+            "insur_eth," +
+            "insur_usdt," +
+            "cbt_btc," +
+            "cbt_eth," +
+            "cbt_usdt," +
+            "r_btc," +
+            "r_eth," +
+            "r_usdt," +
+            "uct_btc," +
+            "uct_eth," +
+            "uct_usdt," +
+            "bec_btc," +
+            "bec_eth," +
+            "bec_usdt," +
+            "mith_btc," +
+            "mith_eth," +
+            "mith_usdt," +
+            "abt_btc," +
+            "abt_eth," +
+            "abt_usdt," +
+            "bkx_btc," +
+            "bkx_eth," +
+            "bkx_usdt," +
+            "gtc_btc," +
+            "gtc_eth," +
+            "gtc_usdt," +
+            "auto_btc," +
+            "auto_eth," +
+            "auto_usdt," +
+            "gsc_btc," +
+            "gsc_eth," +
+            "gsc_usdt," +
+            "rfr_btc," +
+            "rfr_eth," +
+            "rfr_usdt," +
+            "trio_btc," +
+            "trio_eth," +
+            "trio_usdt," +
+            "tra_btc," +
+            "tra_eth," +
+            "tra_usdt," +
+            "ren_btc," +
+            "ren_eth," +
+            "ren_usdt," +
+            "wfee_btc," +
+            "wfee_eth," +
+            "wfee_usdt," +
+            "dadi_btc," +
+            "dadi_eth," +
+            "dadi_usdt," +
+            "enj_btc," +
+            "enj_eth," +
+            "enj_usdt," +
+            "ont_btc," +
+            "ont_eth," +
+            "ont_usdt," +
+            "okb_usdt," +
+            "okb_btc," +
+            "okb_eth," +
+            "ltc_okb," +
+            "etc_okb," +
+            "bch_okb," +
+            "xrp_okb," +
+            "eos_okb," +
+            "qtum_okb," +
+            "dash_okb," +
+            "neo_okb," +
+            "iota_okb," +
+            "zec_okb," +
+            "ctxc_btc," +
+            "ctxc_eth," +
+            "ctxc_usdt," +
+            "zil_btc," +
+            "zil_eth," +
+            "zil_usdt," +
+            "you_okb," +
+            "you_btc," +
+            "you_eth," +
+            "you_usdt," +
+            "lba_okb," +
+            "lba_btc," +
+            "lba_eth," +
+            "lba_usdt," +
+            "ok06ett_usdt," +
+            "cai_okb," +
+            "lsk_btc," +
+            "lsk_eth," +
+            "lsk_usdt," +
+            "cai_btc," +
+            "cai_eth," +
+            "cai_usdt," +
+            "ae_btc," +
+            "ae_okb," +
+            "sc_okb," +
+            "kan_okb," +
+            "win_okb," +
+            "sc_eth," +
+            "sc_btc," +
+            "sc_usdt," +
+            "ae_eth," +
+            "ae_usdt," +
+            "kan_btc," +
+            "kan_eth," +
+            "kan_usdt," +
+            "win_btc," +
+            "win_eth," +
+            "win_usdt," +
+            "ors_okb," +
+            "mvp_okb," +
+            "dcr_okb," +
+            "dcr_btc," +
+            "dcr_eth," +
+            "dcr_usdt," +
+            "waves_okb," +
+            "waves_btc," +
+            "waves_eth," +
+            "waves_usdt," +
+            "ors_btc," +
+            "ors_eth," +
+            "ors_usdt," +
+            "mvp_btc," +
+            "mvp_eth," +
+            "mvp_usdt," +
+            "nas_okb," +
+            "xas_okb," +
+            "hpb_usdt," +
+            "hpb_btc," +
+            "hpb_eth";
+
+
+}

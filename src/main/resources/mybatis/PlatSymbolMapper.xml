@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biup.okex.po.PlatSymbol">
+    <resultMap id="BaseResultMap" type="com.biup.okex.po.PlatSymbol">
+        <id column="sy_id" property="syId" jdbcType="INTEGER"/>
+        <result column="plat_id" property="platId" jdbcType="INTEGER"/>
+        <result column="symbol" property="symbol" jdbcType="VARCHAR"/>
+        <result column="base_currency" property="baseCurrency" jdbcType="VARCHAR"/>
+        <result column="quote_currency" property="quoteCurrency" jdbcType="VARCHAR"/>
+        <result column="price_precision" property="pricePrecision" jdbcType="INTEGER"/>
+        <result column="ctime" property="ctime" jdbcType="TIMESTAMP"/>
+        <result column="mtime" property="mtime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Table_Name">
+		plat_symbol
+	</sql>
+
+    <sql id="Base_Column">
+      sy_id, plat_id, symbol, base_currency, quote_currency, price_precision, ctime, mtime
+    </sql>
+    <select id="selectList" parameterType="com.biup.okex.po.PlatInfo" resultMap="BaseResultMap">
+      SELECT  sy_id, plat_id, symbol, base_currency, quote_currency, price_precision, ctime, mtime from  plat_symbol where plat_id=#{platId}
+    </select>
+</mapper>

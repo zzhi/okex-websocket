@@ -1,0 +1,109 @@
+package com.biup.okex;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.websocketx.*;
+import org.junit.Test;
+import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.net.URI;
+
+/**
+ * @author Stephen Mallette (http://stephen.genoprime.com)
+ */
+public class WebSocketClient {
+
+    //static final String url = "ws://localhost:8090/appws";
+
+    private Channel ch;
+    private static final EventLoopGroup group = new NioEventLoopGroup();
+
+//    public WebSocketClient(final String uri) {
+//        this.uri = URI.create(uri);
+//    }
+
+    public void open() throws Exception {
+        URI uri = new URI("ws://localhost:8090/appws");
+        Bootstrap b = new Bootstrap();
+        String protocol = uri.getScheme();
+        if (!"ws".equals(protocol)) {
+            throw new IllegalArgumentException("Unsupported protocol: " + protocol);
+        }
+
+        // Connect with V13 (RFC 6455 aka HyBi-17). You can change it to V08 or V00.
+        // If you change it to V00, ping is not supported and remember to change
+        // HttpResponseDecoder to WebSocketHttpResponseDecoder in the pipeline.
+        final WebSocketClientHandler handler =
+                new WebSocketClientHandler(
+                        WebSocketClientHandshakerFactory.newHandshaker(
+                                uri, WebSocketVersion.V13, null, false, HttpHeaders.EMPTY_HEADERS, 1280000));
+
+        b.group(group)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception {
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast("http-codec", new HttpClientCodec());
+                        pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+                        pipeline.addLast("ws-handler", handler);
+                    }
+                });
+
+        //System.out.println("WebSocket Client connecting");
+        ch = b.connect(uri.getHost(), uri.getPort()).sync().channel();
+        handler.handshakeFuture().sync();
+    }
+
+    public void close() throws InterruptedException {
+        //System.out.println("WebSocket Client sending close");
+        ch.writeAndFlush(new CloseWebSocketFrame());
+        ch.closeFuture().sync();
+        //group.shutdownGracefully();
+    }
+
+    public void eval() throws IOException {
+        String text = "test";
+        ch.writeAndFlush(new TextWebSocketFrame(text));
+    }
+
+    public void ping() throws IOException {
+        WebSocketFrame frame = new PingWebSocketFrame();
+        ChannelFuture future = ch.writeAndFlush(frame);
+
+        future.addListener(new ChannelFutureListener() {
+            public void operationComplete(ChannelFuture future) {
+                System.out.println("ping");
+            }
+        });
+
+    }
+
+
+    @Test
+    public void tryWebSocket() throws Exception {
+
+        try {
+            String txt = null;
+            Assert.notNull(txt, "空");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+//        final String url = "ws://localhost:8182/websocket";
+//        final WebSocketClient client = new WebSocketClient();
+//        client.open();
+//        client.<String>eval();
+//        Thread.sleep(3000);
+//        client.<String>ping();
+//
+//        client.close();
+    }
+}

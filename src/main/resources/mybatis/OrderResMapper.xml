@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biup.okex.po.OrderRes">
+    <resultMap id="BaseResultMap" type="com.biup.okex.po.OrderRes">
+        <id column="id" property="id"/>
+        <result column="plate_id" property="plateId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="symbol" property="symbol"/>
+        <result column="side" property="side"/>
+        <result column="price" property="price"/>
+        <result column="volume" property="volume"/>
+        <result column="deal_volume" property="dealVolume"/>
+        <result column="deal_money" property="dealMoney"/>
+        <result column="avg_price" property="avgPrice"/>
+        <result column="fee" property="fee"/>
+        <result column="flag" property="flag"/>
+        <result column="status" property="status"/>
+        <result column="extra_info" property="extraInfo"/>
+        <result column="ctime" property="orderTime"/>
+        <result column="mtime" property="mtime"/>
+    </resultMap>
+
+    <sql id="Table_Name">
+		order_res
+	</sql>
+
+    <sql id="Base_Column">
+        id,
+        plate_id,
+        order_id,
+        symbol,
+        side,
+       price,
+        volume,
+       deal_volume,
+        deal_money,
+        avg_price,
+        fee,
+       flag,
+       status,
+        extra_info,
+        ctime,mtime
+    </sql>
+    <select id="selectOne" parameterType="com.biup.okex.po.OrderRes" resultMap="BaseResultMap">
+        select   id,plate_id,order_id,symbol,side,price,volume,
+        deal_volume, deal_money,avg_price,fee,flag,status,extra_info,ctime,mtime from   order_res
+        where plate_id=#{plateId}  and order_id=#{orderId}
+    </select>
+    <select id="getOrderRes" parameterType="com.biup.okex.po.OrderRes" resultMap="BaseResultMap">
+        select   id,plate_id,order_id,symbol,side,price,volume,
+        deal_volume, deal_money,avg_price,fee,flag,status,extra_info,ctime,mtime from   order_res
+        where plate_id=#{plateId}  and order_id=#{orderId}
+    </select>
+    <insert id="insert" parameterType="com.biup.okex.po.OrderRes" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        <include refid="Table_Name"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="plateId != null">
+                plate_id,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="symbol != null">
+                symbol,
+            </if>
+            <if test="side != null">
+                side,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="volume != null">
+                volume,
+            </if>
+            <if test="dealVolume != null">
+                deal_volume,
+            </if>
+            <if test="dealMoney != null">
+                deal_money,
+            </if>
+            <if test="avgPrice != null">
+                avg_price,
+            </if>
+            <if test="fee != null">
+                fee,
+            </if>
+            <if test="flag != null">
+                flag,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="extraInfo != null">
+                extra_info,
+            </if>
+            <if test="orderTime != null">
+                ctime,
+            </if>
+            <if test="mtime != null">
+                mtime
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="plateId != null">
+                #{plateId},
+            </if>
+            <if test="orderId != null">
+                #{orderId},
+            </if>
+            <if test="symbol != null">
+                #{symbol},
+            </if>
+            <if test="side != null">
+                #{side},
+            </if>
+            <if test="price != null">
+                #{price},
+            </if>
+            <if test="volume != null">
+                #{volume},
+            </if>
+            <if test="dealVolume != null">
+                #{dealVolume},
+            </if>
+            <if test="dealMoney != null">
+                #{dealMoney},
+            </if>
+            <if test="avgPrice != null">
+                #{avgPrice},
+            </if>
+            <if test="fee != null">
+                #{fee},
+            </if>
+            <if test="flag != null">
+                #{flag},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="extraInfo != null">
+                #{extraInfo},
+            </if>
+            <if test="orderTime != null">
+                #{orderTime},
+            </if>
+            <if test="mtime != null">
+                #{mtime}
+            </if>
+        </trim>
+    </insert>
+</mapper>

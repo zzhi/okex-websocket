@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biup.okex.po.PlatInfo">
+    <resultMap id="BaseResultMap" type="com.biup.okex.po.PlatInfo">
+        <id column="plat_id" property="platId" jdbcType="INTEGER"/>
+        <result column="plat_code" property="platCode" jdbcType="VARCHAR"/>
+        <result column="plat_name" property="platName" jdbcType="VARCHAR"/>
+        <result column="plat_url" property="platUrl" jdbcType="VARCHAR"/>
+        <result column="access_key" property="accessKey" jdbcType="VARCHAR"/>
+        <result column="secret_key" property="secretKey" jdbcType="VARCHAR"/>
+        <result column="delete_flag" property="deleteFlag" jdbcType="TINYINT"/>
+        <result column="ctime" property="ctime" jdbcType="TIMESTAMP"/>
+        <result column="mtime" property="mtime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Table_Name">
+		plat_info
+	</sql>
+
+    <sql id="Base_Column">
+      plat_id, plat_code, plat_name, plat_url, access_key, secret_key, delete_flag, ctime, mtime
+    </sql>
+    <select id="selectOne" parameterType="com.biup.okex.po.PlatInfo" resultMap="BaseResultMap">
+      SELECT  plat_id, plat_code, plat_name, plat_url, access_key, secret_key, delete_flag, ctime, mtime from plat_info
+        where plat_id=#{platId}
+    </select>
+</mapper>
