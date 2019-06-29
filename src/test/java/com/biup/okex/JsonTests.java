@@ -12,12 +12,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Date;
 
-
 public class JsonTests {
 
     @Test
     public void test0() {
-
+        System.out.println("test");
         String address="0xb384455a41d68f020a1bab9fed36191291ac7431";
         String start=address.substring(0,2);
         String charAndDigit="^[A-Za-z0-9]+$";
