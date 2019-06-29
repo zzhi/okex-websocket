@@ -19,6 +19,7 @@ public class JsonTests {
         System.out.println("test");
         System.out.println("test3");
         System.out.println("test4");
+        System.out.println("test6");
         String address="0xb384455a41d68f020a1bab9fed36191291ac7431";
         String start=address.substring(0,2);
         String charAndDigit="^[A-Za-z0-9]+$";
